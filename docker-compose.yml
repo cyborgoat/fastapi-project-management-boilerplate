@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:13
+    image: postgres:16-alpine # Uses the official PostgreSQL image (version 16, alpine variant for smaller size)
     container_name: project-management-db
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
