@@ -175,6 +175,6 @@ class TestPasswordSecurity:
 
         # Note: This test assumes password validation is implemented
         # If not implemented yet, this test may need adjustment
-        response = client.post("/api/v1/users/", json=short_password_data)
+        _response = client.post("/api/v1/users/", json=short_password_data)
         # This might pass if no password validation is implemented
         # In that case, you should implement password validation

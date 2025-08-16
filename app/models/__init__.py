@@ -1,3 +1,3 @@
-from .project import Project
-from .task import Task
-from .user import User
+from .project import Project as Project
+from .task import Task as Task
+from .user import User as User

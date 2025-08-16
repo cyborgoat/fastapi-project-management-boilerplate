@@ -1,4 +1,11 @@
-from .project import Project, ProjectCreate, ProjectUpdate
-from .task import Task, TaskCreate, TaskUpdate
-from .token import Token, TokenPayload
-from .user import User, UserCreate, UserUpdate
+from .project import Project as Project
+from .project import ProjectCreate as ProjectCreate
+from .project import ProjectUpdate as ProjectUpdate
+from .task import Task as Task
+from .task import TaskCreate as TaskCreate
+from .task import TaskUpdate as TaskUpdate
+from .token import Token as Token
+from .token import TokenPayload as TokenPayload
+from .user import User as User
+from .user import UserCreate as UserCreate
+from .user import UserUpdate as UserUpdate

@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, validator
 
 
 class TaskBase(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    
+
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
     due_date: Optional[datetime] = None

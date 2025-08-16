@@ -39,7 +39,7 @@ def create_task(
         raise HTTPException(status_code=404, detail="Project not found")
     if not crud.project.is_owner(db=db, db_obj=project, user_id=current_user.id):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
+
     task = crud.task.create_with_assignee(db=db, obj_in=task_in, assignee_id=current_user.id)
     return task
 
@@ -58,7 +58,7 @@ def read_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     # Check if user has access through project ownership or task assignment
-    if not (task.assignee_id == current_user.id or 
+    if not (task.assignee_id == current_user.id or
             crud.project.is_owner(db=db, db_obj=task.project, user_id=current_user.id)):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return task
@@ -79,10 +79,10 @@ def update_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     # Check if user has access through project ownership or task assignment
-    if not (task.assignee_id == current_user.id or 
+    if not (task.assignee_id == current_user.id or
             crud.project.is_owner(db=db, db_obj=task.project, user_id=current_user.id)):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
+
     task = crud.task.update(db=db, db_obj=task, obj_in=task_in)
     return task
 
@@ -101,10 +101,10 @@ def delete_task(
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     # Check if user has access through project ownership or task assignment
-    if not (task.assignee_id == current_user.id or 
+    if not (task.assignee_id == current_user.id or
             crud.project.is_owner(db=db, db_obj=task.project, user_id=current_user.id)):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
+
     task = crud.task.remove(db=db, id=task_id)
     return {"message": "Task deleted successfully"}
 
@@ -127,6 +127,6 @@ def get_tasks_by_project(
     # Check if user has access to the project
     if not crud.project.is_owner(db=db, db_obj=project, user_id=current_user.id):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    
+
     tasks = crud.task.get_multi_by_project(db=db, project_id=project_id, skip=skip, limit=limit)
     return tasks

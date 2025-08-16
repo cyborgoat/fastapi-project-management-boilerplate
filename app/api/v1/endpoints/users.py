@@ -97,7 +97,7 @@ def update_user(
             status_code=404,
             detail="The user with this id does not exist in the system",
         )
-    
+
     # Check for duplicate username
     if user_in.username and user_in.username != user.username:
         existing_user = crud.user.get_by_username(db, username=user_in.username)
@@ -106,7 +106,7 @@ def update_user(
                 status_code=400,
                 detail="The user with this username already exists in the system.",
             )
-    
+
     # Check for duplicate email
     if user_in.email and user_in.email != user.email:
         existing_user = crud.user.get_by_email(db, email=user_in.email)
@@ -115,7 +115,7 @@ def update_user(
                 status_code=400,
                 detail="The user with this email already exists in the system.",
             )
-    
+
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
     return user
 
