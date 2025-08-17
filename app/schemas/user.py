@@ -52,7 +52,7 @@ class UserStatusUpdate(BaseModel):
 
 class User(UserBase):
     id: int
-    is_active: bool
+    is_active: bool = True
     is_admin: bool = False
     is_superuser: bool = False
 
