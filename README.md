@@ -15,6 +15,11 @@ A modern, production-ready boilerplate for building project management applicati
   - User registration with username and email
   - User profile management
   - Active/inactive user status
+  - **Role-based Access Control**
+    - Superuser (full system access)
+    - Admin (user management privileges)
+    - Normal User (standard access)
+  - **Default Superuser** automatically created from environment configuration
 - **Project Management**
   - CRUD operations for projects
   - Project ownership and access control
@@ -100,21 +105,85 @@ A modern, production-ready boilerplate for building project management applicati
 6. **Start the development server**
 
    ```bash
-   uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
+   uvicorn app.main:app --reload --port 8000
    ```
 
 The API will be available at:
 
-- **API:** <http://127.0.0.1:8001>
-- **Interactive Docs:** <http://127.0.0.1:8001/docs>
-- **Alternative Docs:** <http://127.0.0.1:8001/redoc>
+- **API:** <http://127.0.0.1:8000>
+- **Interactive Docs:** <http://127.0.0.1:8000/docs>
+- **Alternative Docs:** <http://127.0.0.1:8000/redoc>
+
+## Database Management
+
+### Fresh Start / Clean Database
+
+If you need to start with a completely clean database (removes all data):
+
+1. **Stop the application and database**
+   ```bash
+   # Stop the FastAPI application (Ctrl+C if running)
+   # Stop and remove database containers
+   docker-compose down
+   ```
+
+2. **Remove persistent database data**
+   ```bash
+   # Remove the Docker volume containing database data
+   docker volume rm fastapi-project-management-boilerplate_postgres_data
+   # Or remove all unused volumes
+   docker volume prune
+   ```
+
+3. **Restart database and run migrations**
+   ```bash
+   # Start the database container
+   docker-compose up -d
+   
+   # Run all migrations to create tables
+   alembic upgrade head
+   ```
+
+4. **Start the application**
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+
+The application will automatically create a default superuser with credentials from your `.env` file:
+- **Username:** `admin` (or value from `FIRST_SUPERUSER_USERNAME`)
+- **Email:** `admin@example.com` (or value from `FIRST_SUPERUSER_EMAIL`)
+- **Password:** `admin123` (or value from `FIRST_SUPERUSER_PASSWORD`)
+
+### Migration Troubleshooting
+
+If you encounter database-related errors:
+
+1. **Check if database container is running:**
+   ```bash
+   docker-compose ps
+   ```
+
+2. **Check current migration status:**
+   ```bash
+   alembic current
+   ```
+
+3. **View migration history:**
+   ```bash
+   alembic history
+   ```
+
+4. **Force migration to latest:**
+   ```bash
+   alembic upgrade head
+   ```
 
 ## API Usage Examples
 
 ### User Registration
 
 ```bash
-curl -X POST "http://127.0.0.1:8001/api/v1/users/" \
+curl -X POST "http://127.0.0.1:8000/api/v1/users/" \
   -H "Content-Type: application/json" \
   -d '{
     "username": "johndoe",
@@ -126,7 +195,7 @@ curl -X POST "http://127.0.0.1:8001/api/v1/users/" \
 ### Login with Username
 
 ```bash
-curl -X POST "http://127.0.0.1:8001/api/v1/login/access-token" \
+curl -X POST "http://127.0.0.1:8000/api/v1/login/access-token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=johndoe&password=securepassword123"
 ```
@@ -134,7 +203,7 @@ curl -X POST "http://127.0.0.1:8001/api/v1/login/access-token" \
 ### Login with Email
 
 ```bash
-curl -X POST "http://127.0.0.1:8001/api/v1/login/access-token" \
+curl -X POST "http://127.0.0.1:8000/api/v1/login/access-token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=john@example.com&password=securepassword123"
 ```
@@ -143,7 +212,7 @@ curl -X POST "http://127.0.0.1:8001/api/v1/login/access-token" \
 
 ```bash
 # Use the access_token from login response
-curl -X GET "http://127.0.0.1:8001/api/v1/users/me" \
+curl -X GET "http://127.0.0.1:8000/api/v1/users/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -206,11 +275,15 @@ alembic upgrade head
 alembic downgrade -1
 ```
 
+```
+
 ### Testing
+
 ```bash
 pytest app/tests/ -v
 ```
-All 111 tests pass with 100% coverage.
+
+All 125 tests pass with 100% coverage.
 
 ### Code Quality
 
@@ -228,14 +301,27 @@ Key environment variables in `.env`:
 
 ```env
 # Database
-DATABASE_URL=postgresql://user:password@localhost/projectmanagement
+POSTGRES_USER=dbuser
+POSTGRES_PASSWORD=dbpassword
+POSTGRES_DB=project-management-db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
 
 # Security
 SECRET_KEY=your-secret-key-here
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=11520
 
-# Development
-DEBUG=True
+# API
+API_V1_STR=/api/v1
+
+# Environment
+ENVIRONMENT=development
+
+# Default Superuser Configuration
+FIRST_SUPERUSER_USERNAME=admin
+FIRST_SUPERUSER_EMAIL=admin@example.com
+FIRST_SUPERUSER_PASSWORD=admin123
+FIRST_SUPERUSER_FULL_NAME=System Administrator
 ```
 
 ## Contributing
