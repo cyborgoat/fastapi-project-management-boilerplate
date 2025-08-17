@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate, UserStatusUpdate
 
 router = APIRouter()
 
@@ -117,6 +117,52 @@ def update_user(
             )
 
     user = crud.user.update(db, db_obj=user, obj_in=user_in)
+    return user
+
+
+@router.put("/{user_id}/status", response_model=schemas.User)
+def update_user_status(
+    *,
+    db: Session = Depends(deps.get_db),
+    user_id: int,
+    status_in: UserStatusUpdate,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Update user status (admin/superuser only).
+    Only superusers and admins can change user status.
+    """
+    # Check if current user can manage users
+    if not crud.user.can_manage_users(current_user):
+        raise HTTPException(
+            status_code=403,
+            detail="Not enough permissions to manage user status",
+        )
+
+    user = crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this id does not exist in the system",
+        )
+
+    # Prevent non-superusers from creating superusers
+    if (status_in.is_superuser is True and 
+        not crud.user.is_superuser(current_user)):
+        raise HTTPException(
+            status_code=403,
+            detail="Only superusers can grant superuser privileges",
+        )
+
+    # Prevent users from modifying their own superuser status
+    if (user_id == current_user.id and 
+        status_in.is_superuser is not None):
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot modify your own superuser status",
+        )
+
+    user = crud.user.update_user_status(db, db_obj=user, obj_in=status_in)
     return user
 
 

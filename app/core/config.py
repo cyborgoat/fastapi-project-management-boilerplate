@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
 
+    # Default superuser configuration - loaded from environment
+    FIRST_SUPERUSER_USERNAME: str
+    FIRST_SUPERUSER_EMAIL: str
+    FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER_FULL_NAME: str
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

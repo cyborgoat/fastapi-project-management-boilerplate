@@ -1,4 +1,5 @@
 import asyncio
+import os
 from typing import AsyncGenerator, Generator
 
 import pytest
@@ -10,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.api.deps import get_db
+from app.core.test_config import test_settings
 from app.db.base_class import Base
 from app.main import app
 
@@ -22,6 +24,12 @@ engine = create_engine(
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+@pytest.fixture(scope="session")
+def test_settings_fixture():
+    """Provide test settings for all tests."""
+    return test_settings
 
 
 @pytest.fixture(scope="session")
